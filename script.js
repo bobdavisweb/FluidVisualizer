@@ -689,6 +689,8 @@ function startGUI () {
       var reader = new FileReader();
       reader.onload = function(e){
         audio.setAttribute('src',e.target.result);
+        audio.play();
+        audio.pause();
         //const track = audioContext.createMediaElementSource(audio);
         //track.connect(analyser);
         max = 0.000001;
