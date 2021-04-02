@@ -789,10 +789,11 @@ function startGUI () {
     captureFolder.add(config, 'TRANSPARENT').name('transparent');
     captureFolder.add({ fun: captureScreenshot }, 'fun').name('take screenshot');
 
-    if (isMobile())
+    if (isMobile()){
         audio.play();
         audio.pause();
         gui.close();
+    }
 }
 
 function isMobile () {
