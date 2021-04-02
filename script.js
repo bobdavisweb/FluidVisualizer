@@ -427,8 +427,43 @@ let config10 = {
   SPLASH_BOUNCE: 2
 }
 
+let config11 = {
+  SIM_RESOLUTION: 128,
+  DYE_RESOLUTION: 1024,
+  CAPTURE_RESOLUTION: 512,
+  DENSITY_DISSIPATION: 0.3,
+  VELOCITY_DISSIPATION: 0,
+  PRESSURE: 1.0,
+  PRESSURE_ITERATIONS: 20,
+  CURL: 30,
+  SPLAT_RADIUS: 0.005,
+  SPLAT_FORCE: 20000,
+  SHADING: true,
+  COLORFUL: true,
+  COLOR_UPDATE_SPEED: 10,
+  PAUSED: false,
+  BACK_COLOR: { r: 0, g: 0, b: 0 },
+  TRANSPARENT: false,
+  BLOOM: true,
+  BLOOM_ITERATIONS: 8,
+  BLOOM_RESOLUTION: 256,
+  BLOOM_INTENSITY: 0.1,
+  BLOOM_THRESHOLD: 1.0,
+  BLOOM_SOFT_KNEE: 0.7,
+  SUNRAYS: true,
+  SUNRAYS_RESOLUTION: 196,
+  SUNRAYS_WEIGHT: 1.0,
+  RIPPLE_RADIUS: 0.1,
+  RIPPLE_FORCE: 1000000,
+  RIPPLE_BOUNCE: 3,
+  RIPPLE_SPLAT_RADIUS: 0.01,
+  SPLASH_FORCE: 2000,
+  SPLASH_SPLAT_RADIUS: 0.25,
+  SPLASH_BOUNCE: 2
+}
 
-let config = config7;
+
+let config = config5;
 
 function pointerPrototype () {
     this.id = -1;
@@ -457,6 +492,17 @@ if (!ext.supportLinearFiltering) {
     config.SHADING = false;
     config.BLOOM = false;
     config.SUNRAYS = false;
+}
+
+var text = {
+  speed: 'someName'
+};
+
+var effect_config = {
+  value: {
+    effect: effect4,
+    config: config5
+  }
 }
 
 startGUI();
@@ -551,6 +597,41 @@ function supportRenderTextureFormat (gl, internalFormat, format, type) {
     return status == gl.FRAMEBUFFER_COMPLETE;
 }
 
+var effects =  {
+  ripple: {
+    effect: effect4,
+    config: config7
+  },
+  ripple_blue: {
+    effect: effect5,
+    config: config7
+  },
+  ripple_pink: {
+    effect: effect6,
+    config: config7
+  },
+  water: {
+    effect: effect4,
+    config: config5
+  },
+  water_blue: {
+    effect: effect5,
+    config: config5
+  },
+  water_pink: {
+    effect: effect6,
+    config: config5
+  },
+  syrup: {
+    effect: effect_jet,
+    config: config6
+  },
+  freestyle: {
+    effect: effect_freestyle,
+    config: config11
+  }
+}
+
 function startGUI () {
     var gui = new dat.GUI({ width: 300 });
 
@@ -625,6 +706,24 @@ function startGUI () {
     gui.add({ fun: () => {
         splatStack.push(parseInt(Math.random() * 20) + 5);
     } }, 'fun').name('Random splats');
+
+    gui.add(effect_config, 'value', {
+          ripple: "ripple",
+          ripple_blue: "ripple_blue",
+          ripple_pink: "ripple_pink",
+          water: "water",
+          water_blue: "water_blue",
+          water_pink: "water_pink",
+          syrup: "syrup",
+          freestyle: "freestyle"
+      }).name("effect").onFinishChange(function() {
+        let new_effect = effects[effect_config.value];
+
+        effect = new_effect.effect;
+        config = new_effect.config;
+        initFramebuffers();
+        updateKeywords();
+      });
 
     let bloomFolder = gui.addFolder('Bloom');
     bloomFolder.add(config, 'BLOOM').name('enabled').onFinishChange(updateKeywords);
@@ -1723,7 +1822,6 @@ function effect4(brightness){
 
 function effect5(brightness){
     let color = generateColorInRange(0.4,0.0);
-    console.log(`effect5(${brightness})`);
     effect_ripple(brightness, color);
     effect_random_splash(brightness, color);
     //config.DENSITY_DISSIPATION = 3 - 2*amplitude_norm;
@@ -1751,7 +1849,7 @@ function effect_ripple(brightness,color){
   for(let i = 0; i < n; i++){
     //console.log(i);
     let x = 0.5 + config.RIPPLE_RADIUS*Math.cos(i*(2*Math.PI/n));
-    let y = 0.5 + 1.75*config.RIPPLE_RADIUS*Math.sin(i*(2*Math.PI/n));
+    let y = 0.5 + (canvas.width/canvas.height)*config.RIPPLE_RADIUS*Math.sin(i*(2*Math.PI/n));
     let dx = Math.cos(i*(2*Math.PI/n))*amp;
     let dy = Math.sin(i*(2*Math.PI/n))*amp;
     //console.log(dx);
@@ -1761,7 +1859,7 @@ function effect_ripple(brightness,color){
 
 function effect_spiral_splash(color){
   let x = 0.5 + 2.0*config.RIPPLE_RADIUS*Math.cos(2*Math.PI*t);
-  let y = 0.5 + 1.75*2.0*config.RIPPLE_RADIUS*Math.sin(2*Math.PI*t);
+  let y = 0.5 + (canvas.width/canvas.height)*2.0*config.RIPPLE_RADIUS*Math.sin(2*Math.PI*t);
   let dx = -Math.sin(2*Math.PI*t)*config.SPLASH_FORCE;
   let dy = Math.cos(2*Math.PI*t)*config.SPLASH_FORCE;
   splat(x,y,dx,dy,color, config.SPLASH_SPLAT_RADIUS)
@@ -1803,8 +1901,12 @@ function effect_jet(brightness){
   splat(x,y,dx,dy,color, 2)
 }
 
+function effect_freestyle(brightness){
 
-var effect = effect6;
+}
+
+
+var effect = effect4;
 
 /*
 combos:
@@ -1839,7 +1941,6 @@ function applyInputs (brightness, t, dt) {
       let color = generateColor();
 
       */
-      console.log(`applyInputs(${brightness},${t},${dt})`);
       effect(brightness);
       time_since_last = 0;
 
@@ -2055,9 +2156,15 @@ function splatPointer (pointer) {
     console.log(`config.SPLAT_FORCE: ${config.SPLAT_FORCE}`)
     */
 
+    let colorStart = 0.55 + 0.25*Math.cos(0.5*2*Math.PI*t);
+    if(colorStart > 1){
+      colorStart = colorStart % 1;
+    }
+    let color = generateColorInRange(colorStart, colorStart + 0.4);
+
     let dx = pointer.deltaX * config.SPLAT_FORCE;
     let dy = pointer.deltaY * config.SPLAT_FORCE;
-    splat(pointer.texcoordX, pointer.texcoordY, dx, dy, pointer.color, config.SPLASH_SPLAT_RADIUS);
+    splat(pointer.texcoordX, pointer.texcoordY, dx, dy, color, config.SPLASH_SPLAT_RADIUS);
 }
 
 function multipleSplats (amount) {
