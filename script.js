@@ -387,7 +387,7 @@ let config9 = {
   RIPPLE_BOUNCE: 1,
   RIPPLE_SPLAT_RADIUS: 0.015,
   SPLASH_FORCE: 200000,
-  SPLASH_SPLAT_RADIUS: 0.03,
+  SPLASH_SPLAT_RADIUS: 0.06,
   SPLASH_BOUNCE: 1
 
 }
@@ -507,6 +507,10 @@ var effect_config = {
 
 var track_sample = {
   value: ""
+}
+
+var intensity_config = {
+  value: "spectral flux"
 }
 
 
@@ -634,7 +638,24 @@ var effects =  {
   freestyle: {
     effect: effect_freestyle,
     config: config11
+  },
+  ripple_amplitude_blue: {
+    effect: effect5,
+    config: config9
+  },
+  ripple_amplitude_pink:{
+    effect: effect6,
+    config: config9
+  },
+  syrup_amplitude: {
+    effect: effect_jet,
+    config: config10
   }
+}
+
+var intensity_functions = {
+  "amplitude": amplitude,
+  "spectral flux": spectralFlux
 }
 
 
@@ -709,7 +730,7 @@ function startGUI () {
     gui.add(config, 'DENSITY_DISSIPATION', 0, 4.0).name('density diffusion');
     gui.add(config, 'VELOCITY_DISSIPATION', 0, 4.0).name('velocity diffusion');
     gui.add(config, 'PRESSURE', 0.0, 1.0).name('pressure');
-    gui.add(config, 'CURL', 0, 50).name('vorticity').step(1).onFinishChange(console.log("changed curl"));
+    gui.add(config, 'CURL', 0, 50).name('vorticity').step(1);
     gui.add(config, 'SPLAT_RADIUS', 0.01, 1.0).name('splat radius');
     gui.add(config, 'RIPPLE_SPLAT_RADIUS', 0.01, 1.0).name('ripple splat radius');
     gui.add(config, 'RIPPLE_FORCE', 0, 1000000).name('ripple force');
@@ -732,9 +753,11 @@ function startGUI () {
           water_blue: "water_blue",
           water_pink: "water_pink",
           syrup: "syrup",
-          freestyle: "freestyle"
+          freestyle: "freestyle",
+          ripple_amplitude_blue: "ripple_amplitude_blue",
+          ripple_amplitude_pink: "ripple_amplitude_pink",
+          syrup_amplitude: "syrup_amplitude"
       }).name("effect").onFinishChange(function() {
-        console.log("effect change");
         let new_effect = effects[effect_config.value];
 
         effect = new_effect.effect;
@@ -742,6 +765,14 @@ function startGUI () {
         initFramebuffers();
         updateKeywords();
       });
+    gui.add(intensity_config, 'value', {
+        "amplitude": "amplitude",
+        "spectral flux": "spectral flux"
+    }).name("intensity function").onFinishChange(function() {
+        intensity = intensity_functions[intensity_config.value];
+        max = 0.000001;
+
+    });
 
     let bloomFolder = gui.addFolder('Bloom');
     bloomFolder.add(config, 'BLOOM').name('enabled').onFinishChange(updateKeywords);
