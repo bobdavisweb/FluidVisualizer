@@ -673,6 +673,7 @@ function startGUI () {
     audio.controls = true;
     audio.loop = false;
     audio.autoplay = false;
+    audio.muted = false;
     audioController.domElement.appendChild(audio);
 
     let fileUpload = gui.add({track: () => {
@@ -789,6 +790,8 @@ function startGUI () {
     captureFolder.add({ fun: captureScreenshot }, 'fun').name('take screenshot');
 
     if (isMobile())
+        audio.play();
+        audio.pause();
         gui.close();
 }
 
