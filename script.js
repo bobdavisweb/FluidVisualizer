@@ -29,6 +29,23 @@ SOFTWARE.
 const promoPopup = document.getElementsByClassName('promo')[0];
 const promoPopupClose = document.getElementsByClassName('promo-close')[0];
 
+var max = 0.00000001;
+
+
+var analyser;
+
+window.onload = function(){
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  const audioContext = new AudioContext();
+  const audioElement = document.getElementById('audioEl');
+  const track = audioContext.createMediaElementSource(audioElement);
+  analyser = audioContext.createAnalyser();
+  analyser.fftSize = 2048;
+
+  track.connect(analyser);
+  analyser.connect(audioContext.destination);
+}
+
 if (isMobile()) {
     setTimeout(() => {
         promoPopup.style.display = 'table';
@@ -56,17 +73,17 @@ googleLink.addEventListener('click', e => {
 const canvas = document.getElementsByTagName('canvas')[0];
 resizeCanvas();
 
-let config = {
+let config1 = {
     SIM_RESOLUTION: 128,
     DYE_RESOLUTION: 1024,
     CAPTURE_RESOLUTION: 512,
     DENSITY_DISSIPATION: 1,
     VELOCITY_DISSIPATION: 0.2,
-    PRESSURE: 0.8,
+    PRESSURE: 0.5,
     PRESSURE_ITERATIONS: 20,
     CURL: 30,
-    SPLAT_RADIUS: 0.25,
-    SPLAT_FORCE: 6000,
+    SPLAT_RADIUS: 0.01,
+    SPLAT_FORCE: 2000000,
     SHADING: true,
     COLORFUL: true,
     COLOR_UPDATE_SPEED: 10,
@@ -76,13 +93,342 @@ let config = {
     BLOOM: true,
     BLOOM_ITERATIONS: 8,
     BLOOM_RESOLUTION: 256,
-    BLOOM_INTENSITY: 0.8,
-    BLOOM_THRESHOLD: 0.6,
+    BLOOM_INTENSITY: 0.1,
+    BLOOM_THRESHOLD: 1.0,
     BLOOM_SOFT_KNEE: 0.7,
     SUNRAYS: true,
     SUNRAYS_RESOLUTION: 196,
     SUNRAYS_WEIGHT: 1.0,
+    RIPPLE_RADIUS: 0.05,
+    RIPPLE_FORCE: 200000,
+    RIPPLE_BOUNCE: 5,
+    RIPPLE_SPLAT_RADIUS: 0.01,
+    SPLASH_FORCE: 400000,
+    SPLASH_SPLAT_RADIUS: 0.01,
+    SPLASH_BOUNCE: 1
 }
+
+let config2 = {
+  SIM_RESOLUTION: 128,
+  DYE_RESOLUTION: 1024,
+  CAPTURE_RESOLUTION: 512,
+  DENSITY_DISSIPATION: 1,
+  VELOCITY_DISSIPATION: 0.2,
+  PRESSURE: 0.5,
+  PRESSURE_ITERATIONS: 20,
+  CURL: 30,
+  SPLAT_RADIUS: 0.01,
+  SPLAT_FORCE: 2000000,
+  SHADING: true,
+  COLORFUL: true,
+  COLOR_UPDATE_SPEED: 10,
+  PAUSED: false,
+  BACK_COLOR: { r: 0, g: 0, b: 0 },
+  TRANSPARENT: false,
+  BLOOM: true,
+  BLOOM_ITERATIONS: 8,
+  BLOOM_RESOLUTION: 256,
+  BLOOM_INTENSITY: 0.1,
+  BLOOM_THRESHOLD: 1.0,
+  BLOOM_SOFT_KNEE: 0.7,
+  SUNRAYS: true,
+  SUNRAYS_RESOLUTION: 196,
+  SUNRAYS_WEIGHT: 1.0,
+  RIPPLE_RADIUS: 0.05,
+  RIPPLE_FORCE: 5000,
+  RIPPLE_BOUNCE: 1,
+  RIPPLE_SPLAT_RADIUS: 0.01,
+  SPLASH_FORCE: 200000,
+  SPLASH_SPLAT_RADIUS: 0.01,
+  SPLASH_BOUNCE: 1
+
+}
+
+let config3 = {
+  SIM_RESOLUTION: 128,
+  DYE_RESOLUTION: 1024,
+  CAPTURE_RESOLUTION: 512,
+  DENSITY_DISSIPATION: 1,
+  VELOCITY_DISSIPATION: 0.2,
+  PRESSURE: 1.0,
+  PRESSURE_ITERATIONS: 20,
+  CURL: 30,
+  SPLAT_RADIUS: 0.005,
+  SPLAT_FORCE: 2000000,
+  SHADING: true,
+  COLORFUL: true,
+  COLOR_UPDATE_SPEED: 10,
+  PAUSED: false,
+  BACK_COLOR: { r: 0, g: 0, b: 0 },
+  TRANSPARENT: false,
+  BLOOM: true,
+  BLOOM_ITERATIONS: 8,
+  BLOOM_RESOLUTION: 256,
+  BLOOM_INTENSITY: 0.1,
+  BLOOM_THRESHOLD: 1.0,
+  BLOOM_SOFT_KNEE: 0.7,
+  SUNRAYS: true,
+  SUNRAYS_RESOLUTION: 196,
+  SUNRAYS_WEIGHT: 1.0,
+  RIPPLE_RADIUS: 0.05,
+  RIPPLE_FORCE: 1000000,
+  RIPPLE_BOUNCE: 1,
+  RIPPLE_SPLAT_RADIUS: 0.005,
+  SPLASH_FORCE: 200000,
+  SPLASH_SPLAT_RADIUS: 0.01,
+  SPLASH_BOUNCE: 1
+}
+
+let config4 = {
+    SIM_RESOLUTION: 128,
+    DYE_RESOLUTION: 1024,
+    CAPTURE_RESOLUTION: 512,
+    DENSITY_DISSIPATION: 1,
+    VELOCITY_DISSIPATION: 0.2,
+    PRESSURE: 0.5,
+    PRESSURE_ITERATIONS: 20,
+    CURL: 30,
+    SPLAT_RADIUS: 0.005,
+    SPLAT_FORCE: 2000000,
+    SHADING: true,
+    COLORFUL: true,
+    COLOR_UPDATE_SPEED: 10,
+    PAUSED: false,
+    BACK_COLOR: { r: 0, g: 0, b: 0 },
+    TRANSPARENT: false,
+    BLOOM: true,
+    BLOOM_ITERATIONS: 8,
+    BLOOM_RESOLUTION: 256,
+    BLOOM_INTENSITY: 0.1,
+    BLOOM_THRESHOLD: 1.0,
+    BLOOM_SOFT_KNEE: 0.7,
+    SUNRAYS: true,
+    SUNRAYS_RESOLUTION: 196,
+    SUNRAYS_WEIGHT: 1.0,
+    RIPPLE_RADIUS: 0.05,
+    RIPPLE_FORCE: 100000,
+    RIPPLE_BOUNCE: 5,
+    RIPPLE_SPLAT_RADIUS: 0.005,
+    SPLASH_FORCE: 400000,
+    SPLASH_SPLAT_RADIUS: 0.01,
+    SPLASH_BOUNCE: 1
+}
+
+let config5 = {
+  SIM_RESOLUTION: 128,
+  DYE_RESOLUTION: 1024,
+  CAPTURE_RESOLUTION: 512,
+  DENSITY_DISSIPATION: 0.55,
+  VELOCITY_DISSIPATION: 0,
+  PRESSURE: 1.0,
+  PRESSURE_ITERATIONS: 20,
+  CURL: 30,
+  SPLAT_RADIUS: 0.005,
+  SPLAT_FORCE: 2000000,
+  SHADING: true,
+  COLORFUL: true,
+  COLOR_UPDATE_SPEED: 10,
+  PAUSED: false,
+  BACK_COLOR: { r: 0, g: 0, b: 0 },
+  TRANSPARENT: false,
+  BLOOM: true,
+  BLOOM_ITERATIONS: 8,
+  BLOOM_RESOLUTION: 256,
+  BLOOM_INTENSITY: 0.1,
+  BLOOM_THRESHOLD: 1.0,
+  BLOOM_SOFT_KNEE: 0.7,
+  SUNRAYS: true,
+  SUNRAYS_RESOLUTION: 196,
+  SUNRAYS_WEIGHT: 1.0,
+  RIPPLE_RADIUS: 0.1,
+  RIPPLE_FORCE: 1000000,
+  RIPPLE_BOUNCE: 3,
+  RIPPLE_SPLAT_RADIUS: 0.01,
+  SPLASH_FORCE: 200000,
+  SPLASH_SPLAT_RADIUS: 0.025,
+  SPLASH_BOUNCE: 1
+}
+
+let config6 = {
+  SIM_RESOLUTION: 128,
+  DYE_RESOLUTION: 1024,
+  CAPTURE_RESOLUTION: 512,
+  DENSITY_DISSIPATION: 0.55,
+  VELOCITY_DISSIPATION: 4,
+  PRESSURE: 1.0,
+  PRESSURE_ITERATIONS: 20,
+  CURL: 0,
+  SPLAT_RADIUS: 0.005,
+  SPLAT_FORCE: 2000000,
+  SHADING: true,
+  COLORFUL: true,
+  COLOR_UPDATE_SPEED: 10,
+  PAUSED: false,
+  BACK_COLOR: { r: 0, g: 0, b: 0 },
+  TRANSPARENT: false,
+  BLOOM: true,
+  BLOOM_ITERATIONS: 8,
+  BLOOM_RESOLUTION: 256,
+  BLOOM_INTENSITY: 0.1,
+  BLOOM_THRESHOLD: 1.0,
+  BLOOM_SOFT_KNEE: 0.7,
+  SUNRAYS: true,
+  SUNRAYS_RESOLUTION: 196,
+  SUNRAYS_WEIGHT: 1.0,
+  RIPPLE_RADIUS: 0.1,
+  RIPPLE_FORCE: 1000000,
+  RIPPLE_BOUNCE: 3,
+  RIPPLE_SPLAT_RADIUS: 0.01,
+  SPLASH_FORCE: 2000,
+  SPLASH_SPLAT_RADIUS: 2,
+  SPLASH_BOUNCE: 1
+}
+
+let config7 = {
+  SIM_RESOLUTION: 128,
+  DYE_RESOLUTION: 1024,
+  CAPTURE_RESOLUTION: 512,
+  DENSITY_DISSIPATION: 2.4,
+  VELOCITY_DISSIPATION: 0,
+  PRESSURE: 0.6,
+  PRESSURE_ITERATIONS: 20,
+  CURL: 30,
+  SPLAT_RADIUS: 0.01,
+  SPLAT_FORCE: 2000000,
+  SHADING: true,
+  COLORFUL: true,
+  COLOR_UPDATE_SPEED: 10,
+  PAUSED: false,
+  BACK_COLOR: { r: 0, g: 0, b: 0 },
+  TRANSPARENT: false,
+  BLOOM: true,
+  BLOOM_ITERATIONS: 8,
+  BLOOM_RESOLUTION: 256,
+  BLOOM_INTENSITY: 0.1,
+  BLOOM_THRESHOLD: 1.0,
+  BLOOM_SOFT_KNEE: 0.7,
+  SUNRAYS: true,
+  SUNRAYS_RESOLUTION: 196,
+  SUNRAYS_WEIGHT: 1.0,
+  RIPPLE_RADIUS: 0.05,
+  RIPPLE_FORCE: 10000,
+  RIPPLE_BOUNCE: 1,
+  RIPPLE_SPLAT_RADIUS: 0.015,
+  SPLASH_FORCE: 200000,
+  SPLASH_SPLAT_RADIUS: 0.03,
+  SPLASH_BOUNCE: 1
+
+}
+
+let config8 = {
+  SIM_RESOLUTION: 128,
+  DYE_RESOLUTION: 1024,
+  CAPTURE_RESOLUTION: 512,
+  DENSITY_DISSIPATION: 2.4,
+  VELOCITY_DISSIPATION: 0,
+  PRESSURE: 0.6,
+  PRESSURE_ITERATIONS: 20,
+  CURL: 30,
+  SPLAT_RADIUS: 0.01,
+  SPLAT_FORCE: 2000000,
+  SHADING: true,
+  COLORFUL: true,
+  COLOR_UPDATE_SPEED: 10,
+  PAUSED: false,
+  BACK_COLOR: { r: 0, g: 0, b: 0 },
+  TRANSPARENT: false,
+  BLOOM: true,
+  BLOOM_ITERATIONS: 8,
+  BLOOM_RESOLUTION: 256,
+  BLOOM_INTENSITY: 0.1,
+  BLOOM_THRESHOLD: 1.0,
+  BLOOM_SOFT_KNEE: 0.7,
+  SUNRAYS: true,
+  SUNRAYS_RESOLUTION: 196,
+  SUNRAYS_WEIGHT: 1.0,
+  RIPPLE_RADIUS: 0.05,
+  RIPPLE_FORCE: 5000,
+  RIPPLE_BOUNCE: 1,
+  RIPPLE_SPLAT_RADIUS: 0.006,
+  SPLASH_FORCE: 200000,
+  SPLASH_SPLAT_RADIUS: 0.03,
+  SPLASH_BOUNCE: 1
+
+}
+
+let config9 = {
+  SIM_RESOLUTION: 128,
+  DYE_RESOLUTION: 1024,
+  CAPTURE_RESOLUTION: 512,
+  DENSITY_DISSIPATION: 2.4,
+  VELOCITY_DISSIPATION: 0.5,
+  PRESSURE: 0.6,
+  PRESSURE_ITERATIONS: 20,
+  CURL: 30,
+  SPLAT_RADIUS: 0.01,
+  SPLAT_FORCE: 2000000,
+  SHADING: true,
+  COLORFUL: true,
+  COLOR_UPDATE_SPEED: 10,
+  PAUSED: false,
+  BACK_COLOR: { r: 0, g: 0, b: 0 },
+  TRANSPARENT: false,
+  BLOOM: true,
+  BLOOM_ITERATIONS: 8,
+  BLOOM_RESOLUTION: 256,
+  BLOOM_INTENSITY: 0.1,
+  BLOOM_THRESHOLD: 1.0,
+  BLOOM_SOFT_KNEE: 0.7,
+  SUNRAYS: true,
+  SUNRAYS_RESOLUTION: 196,
+  SUNRAYS_WEIGHT: 1.0,
+  RIPPLE_RADIUS: 0.05,
+  RIPPLE_FORCE: 700,
+  RIPPLE_BOUNCE: 1,
+  RIPPLE_SPLAT_RADIUS: 0.015,
+  SPLASH_FORCE: 200000,
+  SPLASH_SPLAT_RADIUS: 0.03,
+  SPLASH_BOUNCE: 1
+
+}
+
+let config10 = {
+  SIM_RESOLUTION: 128,
+  DYE_RESOLUTION: 1024,
+  CAPTURE_RESOLUTION: 512,
+  DENSITY_DISSIPATION: 0.55,
+  VELOCITY_DISSIPATION: 4,
+  PRESSURE: 1.0,
+  PRESSURE_ITERATIONS: 20,
+  CURL: 0,
+  SPLAT_RADIUS: 0.005,
+  SPLAT_FORCE: 2000000,
+  SHADING: true,
+  COLORFUL: true,
+  COLOR_UPDATE_SPEED: 10,
+  PAUSED: false,
+  BACK_COLOR: { r: 0, g: 0, b: 0 },
+  TRANSPARENT: false,
+  BLOOM: true,
+  BLOOM_ITERATIONS: 8,
+  BLOOM_RESOLUTION: 256,
+  BLOOM_INTENSITY: 0.1,
+  BLOOM_THRESHOLD: 1.0,
+  BLOOM_SOFT_KNEE: 0.7,
+  SUNRAYS: true,
+  SUNRAYS_RESOLUTION: 196,
+  SUNRAYS_WEIGHT: 1.0,
+  RIPPLE_RADIUS: 0.1,
+  RIPPLE_FORCE: 1000000,
+  RIPPLE_BOUNCE: 3,
+  RIPPLE_SPLAT_RADIUS: 0.01,
+  SPLASH_FORCE: 2000,
+  SPLASH_SPLAT_RADIUS: 2,
+  SPLASH_BOUNCE: 2
+}
+
+
+let config = config7;
 
 function pointerPrototype () {
     this.id = -1;
@@ -207,6 +553,59 @@ function supportRenderTextureFormat (gl, internalFormat, format, type) {
 
 function startGUI () {
     var gui = new dat.GUI({ width: 300 });
+
+    let audioController = gui.add( {audio: () => {
+
+    }},'audio');
+
+
+    var audio = new Audio();
+    //audio.src = 'music/surf_mesa_ily.mp3';
+    audio.id = "audioEl";
+    audio.controls = true;
+    audio.loop = false;
+    audio.autoplay = false;
+    audioController.domElement.appendChild(audio);
+
+    let fileUpload = gui.add({track: () => {
+
+    }}, 'track');
+    let fileInput = document.createElement('input');
+    fileInput.setAttribute('type','file');
+    fileUpload.domElement.appendChild(fileInput);
+
+    fileInput.onchange = function(e){
+      var target = e.currentTarget;
+      var file = target.files[0];
+      var reader = new FileReader();
+      reader.onload = function(e){
+        audio.setAttribute('src',e.target.result);
+        //const track = audioContext.createMediaElementSource(audio);
+        //track.connect(analyser);
+        max = 0.000001;
+        max_amplitude = 0.000001;
+        max_spectral_flux = 0.000001;
+      }
+      reader.readAsDataURL(file);
+    }
+    /*
+    $('input').on('change', function(e) {
+      var target = e.currentTarget;
+      var file = target.files[0];
+      var reader = new FileReader();
+
+      console.log($audio[0]);
+       if (target.files && file) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $audio.attr('src', e.target.result);
+                $audio.play();
+            }
+            reader.readAsDataURL(file);
+        }
+    });*/
+
+
     gui.add(config, 'DYE_RESOLUTION', { 'high': 1024, 'medium': 512, 'low': 256, 'very low': 128 }).name('quality').onFinishChange(initFramebuffers);
     gui.add(config, 'SIM_RESOLUTION', { '32': 32, '64': 64, '128': 128, '256': 256 }).name('sim resolution').onFinishChange(initFramebuffers);
     gui.add(config, 'DENSITY_DISSIPATION', 0, 4.0).name('density diffusion');
@@ -214,6 +613,11 @@ function startGUI () {
     gui.add(config, 'PRESSURE', 0.0, 1.0).name('pressure');
     gui.add(config, 'CURL', 0, 50).name('vorticity').step(1);
     gui.add(config, 'SPLAT_RADIUS', 0.01, 1.0).name('splat radius');
+    gui.add(config, 'RIPPLE_SPLAT_RADIUS', 0.01, 1.0).name('ripple splat radius');
+    gui.add(config, 'RIPPLE_FORCE', 0, 1000000).name('ripple force');
+    gui.add(config, 'RIPPLE_RADIUS', 0, 1.0).name('ripple radius');
+    gui.add(config, 'SPLASH_SPLAT_RADIUS', 0.01, 1.0).name('splash splat radius');
+    gui.add(config, 'SPLASH_FORCE', 0, 1000000).name('splash force');
     gui.add(config, 'SHADING').name('shading').onFinishChange(updateKeywords);
     gui.add(config, 'COLORFUL').name('colorful');
     gui.add(config, 'PAUSED').name('paused').listen();
@@ -235,46 +639,6 @@ function startGUI () {
     captureFolder.addColor(config, 'BACK_COLOR').name('background color');
     captureFolder.add(config, 'TRANSPARENT').name('transparent');
     captureFolder.add({ fun: captureScreenshot }, 'fun').name('take screenshot');
-
-    let github = gui.add({ fun : () => {
-        window.open('https://github.com/PavelDoGreat/WebGL-Fluid-Simulation');
-        ga('send', 'event', 'link button', 'github');
-    } }, 'fun').name('Github');
-    github.__li.className = 'cr function bigFont';
-    github.__li.style.borderLeft = '3px solid #8C8C8C';
-    let githubIcon = document.createElement('span');
-    github.domElement.parentElement.appendChild(githubIcon);
-    githubIcon.className = 'icon github';
-
-    let twitter = gui.add({ fun : () => {
-        ga('send', 'event', 'link button', 'twitter');
-        window.open('https://twitter.com/PavelDoGreat');
-    } }, 'fun').name('Twitter');
-    twitter.__li.className = 'cr function bigFont';
-    twitter.__li.style.borderLeft = '3px solid #8C8C8C';
-    let twitterIcon = document.createElement('span');
-    twitter.domElement.parentElement.appendChild(twitterIcon);
-    twitterIcon.className = 'icon twitter';
-
-    let discord = gui.add({ fun : () => {
-        ga('send', 'event', 'link button', 'discord');
-        window.open('https://discordapp.com/invite/CeqZDDE');
-    } }, 'fun').name('Discord');
-    discord.__li.className = 'cr function bigFont';
-    discord.__li.style.borderLeft = '3px solid #8C8C8C';
-    let discordIcon = document.createElement('span');
-    discord.domElement.parentElement.appendChild(discordIcon);
-    discordIcon.className = 'icon discord';
-
-    let app = gui.add({ fun : () => {
-        ga('send', 'event', 'link button', 'app');
-        window.open('http://onelink.to/5b58bn');
-    } }, 'fun').name('Check out mobile app');
-    app.__li.className = 'cr function appBigFont';
-    app.__li.style.borderLeft = '3px solid #00FF7F';
-    let appIcon = document.createElement('span');
-    app.domElement.parentElement.appendChild(appIcon);
-    appIcon.className = 'icon app';
 
     if (isMobile())
         gui.close();
@@ -1167,18 +1531,109 @@ function updateKeywords () {
 
 updateKeywords();
 initFramebuffers();
-multipleSplats(parseInt(Math.random() * 20) + 5);
+//multipleSplats(parseInt(Math.random() * 20) + 5);
 
 let lastUpdateTime = Date.now();
 let colorUpdateTimer = 0.0;
 update();
 
+var current_amplitude;
+var max_amplitude = 0.0000001;
+var amplitude_norm;
+function amplitude(){
+	let td_array = new Uint8Array(analyser.fftSize);
+	analyser.getByteTimeDomainData(td_array);
+	var s = 0;
+	for(var i = 0 ; i < analyser.fftSize; i++){
+		s = s + Math.abs(td_array[i] - 128);
+	}
+	var avg = s/(analyser.fftSize*128);
+	return avg;
+
+}
+
+var last_fd;
+
+var current_spectral_flux;
+var max_spectral_flux = 0.000001;
+var spectral_flux_norm;
+//spectral flux method
+function spectralFlux(){
+  if(!last_fd){
+    last_fd = new Uint8Array(analyser.frequencyBinCount).fill(0);
+  }
+  var cur_fd = new Uint8Array(analyser.frequencyBinCount);
+  var dummy = new Uint8Array(analyser.fftSize);
+  analyser.getByteFrequencyData(cur_fd);
+  analyser.getByteTimeDomainData(dummy);
+  var s = 0;
+  for(var i = 0; i < analyser.frequencyBinCount; i++){
+
+    let d = cur_fd[i] - last_fd[i];
+    if(d > 0){
+      s = s + d;
+    }
+  }
+
+  last_fd = cur_fd;
+  var avg = s/(analyser.frequencyBinCount*255);
+
+  return avg;
+}
+
+var max_intensity = 0.00000001;
+function getIntensity(analyser){
+    let spectral_flux = spectralFlux(analyser);
+    if(spectral_flux > max_spectralFlux){
+      max_spectralFlux = spectral_flux;
+    }
+    let sf_norm = spectral_flux / max_spectralFlux;
+
+    let amp = amplitude(analyser);
+    if(amplitude > max){
+      max = amplitude;
+    }
+    let amp_norm = amp/max;
+    return sf_norm + amp_norm;
+}
+
+var t = 0;
+
 function update () {
+    var brightness_norm;
+    if(analyser){
+      /*
+      current_spectral_flux = spectralFlux(analyser);
+      if(current_spectral_flux > max_spectral_flux){
+      	max_spectral_flux = current_spectral_flux;
+      }
+      spectral_flux_norm = current_spectral_flux/max_spectral_flux;
+      //console.log(`spectral flux norm: ${spectral_flux_norm}`)
+
+      current_amplitude = spectralFlux(analyser);
+      if(current_amplitude > max_amplitude){
+      	max_amplitude= current_amplitude;
+      }
+      amplitude_norm = current_amplitude/max_amplitude;
+      //console.log(`amplitude: ${amplitude_norm}`);
+      */
+      var brightness = spectralFlux(analyser)
+      if(brightness > max){
+        max = brightness;
+      }
+      brightness_norm = brightness/max;
+
+    }else{
+      brightness_norm = 0;
+    }
+    t = t + 0.02;
+
     const dt = calcDeltaTime();
     if (resizeCanvas())
         initFramebuffers();
     updateColors(dt);
-    applyInputs();
+    //console.log(`dt: ${dt}`);
+    applyInputs(brightness_norm, t, dt);
     if (!config.PAUSED)
         step(dt);
     render(null);
@@ -1216,9 +1671,181 @@ function updateColors (dt) {
     }
 }
 
-function applyInputs () {
+var time_since_last = 0;
+
+var t_ = 0;
+var splash_x = 0.5;
+var splash_y = 0.5;
+var splash_dx = 0;
+var splash_dy = 0;
+
+
+function effect1(brightness){
+
+  let color = generateColor();
+
+  effect_ripple(brightness,color);
+
+  effect_spiral_splash(color);
+
+  effect_random_splash(brightness, color);
+
+}
+
+function effect2(brightness){
+    let color = generateColorInRange(0.5,1.0);
+
+
+    effect_ripple(brightness,color);
+
+    effect_spiral_splash(color);
+}
+
+function effect3(brightness){
+    let color = generateColor();
+    effect_ripple(brightness, color);
+    effect_random_splash(brightness, color);
+}
+
+function effect4(brightness){
+    let colorStart = 0.0 + 0.05*t;
+    if(colorStart > 1){
+      colorStart = colorStart % 1;
+    }
+    //config.RIPPLE_SPLAT_RADIUS = 0.2*brightness;
+    //config.SPLASH_SPLAT_RADIUS = 0.03*brightness;
+    let color = generateColorInRange(colorStart,colorStart + 0.6);
+    effect_ripple(brightness, color);
+    let splash_color = generateColorInRange(colorStart, colorStart + 0.6);
+    effect_random_splash(brightness, splash_color);
+    //config.DENSITY_DISSIPATION = 3 - 2*amplitude_norm;
+}
+
+function effect5(brightness){
+    let color = generateColorInRange(0.4,0.0);
+    console.log(`effect5(${brightness})`);
+    effect_ripple(brightness, color);
+    effect_random_splash(brightness, color);
+    //config.DENSITY_DISSIPATION = 3 - 2*amplitude_norm;
+}
+
+function effect6(brightness){
+    let color = generateColorInRange(0.85,0.1);
+    effect_ripple(brightness, color);
+    effect_random_splash(brightness, color);
+    //config.DENSITY_DISSIPATION = 3 - 2*amplitude_norm;
+}
+
+
+
+
+function effect_ripple(brightness,color){
+  let f = 0.015;
+  let n = 40;
+  let r = 0.2;
+  t_ = t_ + f;
+
+  let amp = config.RIPPLE_FORCE*Math.pow(brightness,config.RIPPLE_BOUNCE);
+  //console.log(`amp: ${amp}`);
+  //console.log(`brightness: ${brightness}`);
+  for(let i = 0; i < n; i++){
+    //console.log(i);
+    let x = 0.5 + config.RIPPLE_RADIUS*Math.cos(i*(2*Math.PI/n));
+    let y = 0.5 + 1.75*config.RIPPLE_RADIUS*Math.sin(i*(2*Math.PI/n));
+    let dx = Math.cos(i*(2*Math.PI/n))*amp;
+    let dy = Math.sin(i*(2*Math.PI/n))*amp;
+    //console.log(dx);
+    splat(x, y, dx, dy, color, config.RIPPLE_SPLAT_RADIUS);
+  }
+}
+
+function effect_spiral_splash(color){
+  let x = 0.5 + 2.0*config.RIPPLE_RADIUS*Math.cos(2*Math.PI*t);
+  let y = 0.5 + 1.75*2.0*config.RIPPLE_RADIUS*Math.sin(2*Math.PI*t);
+  let dx = -Math.sin(2*Math.PI*t)*config.SPLASH_FORCE;
+  let dy = Math.cos(2*Math.PI*t)*config.SPLASH_FORCE;
+  splat(x,y,dx,dy,color, config.SPLASH_SPLAT_RADIUS)
+}
+
+function effect_random_splash(brightness, color){
+  splash_x = splash_x + splash_dx;
+  splash_y = splash_y + splash_dy;
+  splash_dx = splash_dx + 0.02*brightness*(0.5 - Math.random()) - 0.05*splash_dx - 0.02*(splash_x-0.5) + 0.05*(0.5 - Math.random())*splash_y;
+  splash_dy = splash_dy + 0.02*brightness*(0.5 - Math.random()) - 0.05*splash_dy - 0.02*(splash_y-0.5) + 0.05*(0.5 - Math.random())*splash_x;
+
+  let x = splash_x;
+  let y = splash_y;
+  let dx = splash_dx*config.SPLASH_FORCE;
+  let dy = splash_dy*config.SPLASH_FORCE;
+  splat(x, y, dx, dy, color, config.SPLASH_SPLAT_RADIUS);
+}
+
+function effect_jet(brightness){
+  let colorStart = 0.0 + 0.05*t;
+  if(colorStart > 1){
+    colorStart = colorStart % 1;
+  }
+  //config.RIPPLE_SPLAT_RADIUS = 0.2*brightness;
+  //config.SPLASH_SPLAT_RADIUS = 0.03*brightness;
+  let color = generateColor3(colorStart,colorStart + 0.6,brightness);
+
+  let f = 0.05;
+  let r = 0;
+  let amp = config.SPLASH_FORCE*Math.pow(brightness,config.SPLASH_BOUNCE);
+  let x = 0.5 + 0.1*Math.cos(f*2*Math.PI*t)
+  let y = 0.5 + 2*0.1*Math.sin(f*2*Math.PI*t);
+  /*
+  let dx = -Math.cos(f*2*Math.PI*t)*amp;
+  let dy = -Math.sin(f*2*Math.PI*t)*amp;
+  */
+  let dx = -Math.cos(f*2*Math.PI*t)*amp;
+  let dy = -Math.sin(f*2*Math.PI*t)*amp;
+  splat(x,y,dx,dy,color, 2)
+}
+
+
+var effect = effect6;
+
+/*
+combos:
+* config3 + effect4
+* config5 + effect4
+* config6 + effect_jet
+* config7 + effect4
+* config7 + effect5
+* config7 + effect6
+* config7 + effect2
+
+* ily
+  * config9 + effect5 + amplitude
+  * config9 + effect6 + amplitude
+  * config9 + effect2 + amplitude
+  * config10 + effect_jet + amplitude
+*/
+
+function applyInputs (brightness, t, dt) {
     if (splatStack.length > 0)
         multipleSplats(splatStack.pop());
+
+    if(time_since_last > 0.005){
+      //console.log("splatting...")
+      /*
+      let f = 2;
+      let r = 0.075;
+      let x = 0.5 + r*Math.sin(f*2*Math.PI*t) + 0.25*Math.sin(0.1*2*Math.PI*t);
+      let y = 0.5 + r*Math.cos(f*2*Math.PI*t);
+      let dx = (r*Math.cos(f*2*Math.PI*t))*(40000*(Math.pow(brightness,3)));
+      let dy = -(r*Math.sin(f*2*Math.PI*t))*(40000*(Math.pow(brightness,3)));
+      let color = generateColor();
+
+      */
+      console.log(`applyInputs(${brightness},${t},${dt})`);
+      effect(brightness);
+      time_since_last = 0;
+
+    }else{
+      time_since_last = time_since_last + dt;
+    }
 
     pointers.forEach(p => {
         if (p.moved) {
@@ -1226,6 +1853,7 @@ function applyInputs () {
             splatPointer(p);
         }
     });
+
 }
 
 function step (dt) {
@@ -1419,9 +2047,17 @@ function blur (target, temp, iterations) {
 }
 
 function splatPointer (pointer) {
+    /*
+    console.log(`pointer.texcoordX: ${pointer.texcoordX}`)
+    console.log(`pointer.texcoordY: ${pointer.texcoordY}`)
+    console.log(`pointer.deltaX: ${pointer.deltaX}`)
+    console.log(`pointer.deltaY: ${pointer.deltaY}`)
+    console.log(`config.SPLAT_FORCE: ${config.SPLAT_FORCE}`)
+    */
+
     let dx = pointer.deltaX * config.SPLAT_FORCE;
     let dy = pointer.deltaY * config.SPLAT_FORCE;
-    splat(pointer.texcoordX, pointer.texcoordY, dx, dy, pointer.color);
+    splat(pointer.texcoordX, pointer.texcoordY, dx, dy, pointer.color, config.SPLASH_SPLAT_RADIUS);
 }
 
 function multipleSplats (amount) {
@@ -1434,17 +2070,19 @@ function multipleSplats (amount) {
         const y = Math.random();
         const dx = 1000 * (Math.random() - 0.5);
         const dy = 1000 * (Math.random() - 0.5);
-        splat(x, y, dx, dy, color);
+        splat(x, y, dx, dy, color, config.SPLASH_SPLAT_RADIUS);
     }
 }
 
-function splat (x, y, dx, dy, color) {
+function splat (x, y, dx, dy, color, radius) {
+    //console.log(`splat(${x}, ${y}, ${dx}, ${dy}, ${color})`);
+    //console.log(color);
     splatProgram.bind();
     gl.uniform1i(splatProgram.uniforms.uTarget, velocity.read.attach(0));
     gl.uniform1f(splatProgram.uniforms.aspectRatio, canvas.width / canvas.height);
     gl.uniform2f(splatProgram.uniforms.point, x, y);
     gl.uniform3f(splatProgram.uniforms.color, dx, dy, 0.0);
-    gl.uniform1f(splatProgram.uniforms.radius, correctRadius(config.SPLAT_RADIUS / 100.0));
+    gl.uniform1f(splatProgram.uniforms.radius, correctRadius(radius / 100.0));
     blit(velocity.write);
     velocity.swap();
 
@@ -1563,10 +2201,50 @@ function correctDeltaY (delta) {
 }
 
 function generateColor () {
-    let c = HSVtoRGB(Math.random(), 1.0, 1.0);
-    c.r *= 0.15;
-    c.g *= 0.15;
-    c.b *= 0.15;
+    let h = Math.pow(Math.random(),1)
+    if(h >= 1){
+      h = h - 1;
+    }
+    let c = HSVtoRGB(h, 1.0, 1.0);
+    c.r *= 0.2;
+    c.g *= 0.2;
+    c.b *= 0.2;
+    return c;
+}
+
+function generateColorInRange (start, end) {
+    var delta;
+    if (start <= end){
+      delta = end -start;
+    }else{
+      delta = end + 1 - start;
+    }
+    let h = Math.random()*delta + start;
+    if(h >= 1){
+      h = h - 1;
+    }
+    let c = HSVtoRGB(h, 1.0, 1.0);
+    c.r *= 0.2;
+    c.g *= 0.2;
+    c.b *= 0.2;
+    return c;
+}
+
+function generateColor3 (start, end, brightness) {
+    var delta;
+    if (start <= end){
+      delta = end -start;
+    }else{
+      delta = end + 1 - start;
+    }
+    let h = Math.random()*delta + start;
+    if(h >= 1){
+      h = h - 1;
+    }
+    let c = HSVtoRGB(h, 1.0, 1.0);
+    c.r *= 0.15
+    c.g *= 0.15
+    c.b *= 0.15
     return c;
 }
 
