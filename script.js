@@ -223,8 +223,8 @@ let config5 = {
   PRESSURE: 1.0,
   PRESSURE_ITERATIONS: 20,
   CURL: 30,
-  SPLAT_RADIUS: 0.005,
-  SPLAT_FORCE: 2000000,
+  SPLAT_RADIUS: 0.1,
+  SPLAT_FORCE: 20000,
   SHADING: true,
   COLORFUL: true,
   COLOR_UPDATE_SPEED: 10,
@@ -258,8 +258,8 @@ let config6 = {
   PRESSURE: 1.0,
   PRESSURE_ITERATIONS: 20,
   CURL: 0,
-  SPLAT_RADIUS: 0.005,
-  SPLAT_FORCE: 2000000,
+  SPLAT_RADIUS: 0.1,
+  SPLAT_FORCE: 20000,
   SHADING: true,
   COLORFUL: true,
   COLOR_UPDATE_SPEED: 10,
@@ -293,8 +293,8 @@ let config7 = {
   PRESSURE: 0.6,
   PRESSURE_ITERATIONS: 20,
   CURL: 30,
-  SPLAT_RADIUS: 0.01,
-  SPLAT_FORCE: 2000000,
+  SPLAT_RADIUS: 0.1,
+  SPLAT_FORCE: 20000,
   SHADING: true,
   COLORFUL: true,
   COLOR_UPDATE_SPEED: 10,
@@ -431,12 +431,12 @@ let config11 = {
   SIM_RESOLUTION: 128,
   DYE_RESOLUTION: 1024,
   CAPTURE_RESOLUTION: 512,
-  DENSITY_DISSIPATION: 0.3,
+  DENSITY_DISSIPATION: 0.8,
   VELOCITY_DISSIPATION: 0,
   PRESSURE: 1.0,
   PRESSURE_ITERATIONS: 20,
   CURL: 30,
-  SPLAT_RADIUS: 0.005,
+  SPLAT_RADIUS: 0.1,
   SPLAT_FORCE: 20000,
   SHADING: true,
   COLORFUL: true,
@@ -458,7 +458,7 @@ let config11 = {
   RIPPLE_BOUNCE: 3,
   RIPPLE_SPLAT_RADIUS: 0.01,
   SPLASH_FORCE: 2000,
-  SPLASH_SPLAT_RADIUS: 0.25,
+  SPLASH_SPLAT_RADIUS: 0.1,
   SPLASH_BOUNCE: 2
 }
 
@@ -504,6 +504,11 @@ var effect_config = {
     config: config5
   }
 }
+
+var track_sample = {
+  value: ""
+}
+
 
 startGUI();
 
@@ -632,6 +637,7 @@ var effects =  {
   }
 }
 
+
 function startGUI () {
     var gui = new dat.GUI({ width: 300 });
 
@@ -669,6 +675,17 @@ function startGUI () {
       }
       reader.readAsDataURL(file);
     }
+
+    gui.add(track_sample, "value", {
+      "Spoon - don't you evah": "music/spoon_dont_you_evah.mp3",
+      "RJD2 - ghostwriter": "music/rjd2_ghostwriter.mp3",
+      "Surf Mesa - ily": "music/surf_mesa_ily.mp3"
+    }).name("samples").onFinishChange(function(){
+      audio.setAttribute('src',track_sample.value);
+      max = 0.000001;
+      max_amplitude = 0.000001;
+      max_spectral_flux = 0.000001;
+    });
     /*
     $('input').on('change', function(e) {
       var target = e.currentTarget;
@@ -692,7 +709,7 @@ function startGUI () {
     gui.add(config, 'DENSITY_DISSIPATION', 0, 4.0).name('density diffusion');
     gui.add(config, 'VELOCITY_DISSIPATION', 0, 4.0).name('velocity diffusion');
     gui.add(config, 'PRESSURE', 0.0, 1.0).name('pressure');
-    gui.add(config, 'CURL', 0, 50).name('vorticity').step(1);
+    gui.add(config, 'CURL', 0, 50).name('vorticity').step(1).onFinishChange(console.log("changed curl"));
     gui.add(config, 'SPLAT_RADIUS', 0.01, 1.0).name('splat radius');
     gui.add(config, 'RIPPLE_SPLAT_RADIUS', 0.01, 1.0).name('ripple splat radius');
     gui.add(config, 'RIPPLE_FORCE', 0, 1000000).name('ripple force');
@@ -717,6 +734,7 @@ function startGUI () {
           syrup: "syrup",
           freestyle: "freestyle"
       }).name("effect").onFinishChange(function() {
+        console.log("effect change");
         let new_effect = effects[effect_config.value];
 
         effect = new_effect.effect;
@@ -1634,7 +1652,6 @@ initFramebuffers();
 
 let lastUpdateTime = Date.now();
 let colorUpdateTimer = 0.0;
-update();
 
 var current_amplitude;
 var max_amplitude = 0.0000001;
@@ -1680,23 +1697,11 @@ function spectralFlux(){
   return avg;
 }
 
-var max_intensity = 0.00000001;
-function getIntensity(analyser){
-    let spectral_flux = spectralFlux(analyser);
-    if(spectral_flux > max_spectralFlux){
-      max_spectralFlux = spectral_flux;
-    }
-    let sf_norm = spectral_flux / max_spectralFlux;
-
-    let amp = amplitude(analyser);
-    if(amplitude > max){
-      max = amplitude;
-    }
-    let amp_norm = amp/max;
-    return sf_norm + amp_norm;
-}
+var intensity = spectralFlux;
 
 var t = 0;
+
+update();
 
 function update () {
     var brightness_norm;
@@ -1716,7 +1721,7 @@ function update () {
       amplitude_norm = current_amplitude/max_amplitude;
       //console.log(`amplitude: ${amplitude_norm}`);
       */
-      var brightness = spectralFlux(analyser)
+      var brightness = intensity(analyser)
       if(brightness > max){
         max = brightness;
       }
@@ -2164,7 +2169,7 @@ function splatPointer (pointer) {
 
     let dx = pointer.deltaX * config.SPLAT_FORCE;
     let dy = pointer.deltaY * config.SPLAT_FORCE;
-    splat(pointer.texcoordX, pointer.texcoordY, dx, dy, color, config.SPLASH_SPLAT_RADIUS);
+    splat(pointer.texcoordX, pointer.texcoordY, dx, dy, color, config.SPLAT_RADIUS);
 }
 
 function multipleSplats (amount) {
