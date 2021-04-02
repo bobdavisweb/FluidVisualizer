@@ -46,11 +46,13 @@ window.onload = function(){
   analyser.connect(audioContext.destination);
 }
 
+/*
 if (isMobile()) {
     setTimeout(() => {
         promoPopup.style.display = 'table';
     }, 20000);
 }
+*/
 
 promoPopupClose.addEventListener('click', e => {
     promoPopup.style.display = 'none';
