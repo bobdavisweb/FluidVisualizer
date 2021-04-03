@@ -2,29 +2,34 @@
 <html>
 <head>
   <script type="text/javascript">
-  function getAudioFile(audioCtx, url) {
+  function getAudioFile(audioCtx, audioElement, url) {
     source = audioCtx.createBufferSource();
     var request = new XMLHttpRequest();
 
     request.open('GET', url, true);
 
-    request.responseType = 'arraybuffer';
+    request.responseType = 'blob';
 
-    request.onload = function() {
-      var audioData = request.response;
+    request.onload = function(blob) {
+        var fileReader = new FileReader();
+        fileReader.onload = function() {
+            var arrayBuffer = this.result;
 
-      audioCtx.decodeAudioData(audioData, function(buffer) {
-          source.buffer = buffer;
+            audioCtx.decodeAudioData(arrayBuffer, function(audioBuffer) {
+                source.buffer = audioBuffer;
 
-          //source.connect(audioCtx.destination);
-          //source.loop = true;
-        },
-
-        function(e){ console.log("Error with decoding audio data" + e.err); });
-
+                //source.connect(audioCtx.destination);
+                //source.loop = true;
+              },
+              function(e){ console.log("Error with decoding audio data" + e.err); }
+            );
+        };
+        fileReader.readAsArrayBuffer(blob);
+        audioElement.src = window.URL.createObjectURL(blob);
     }
 
     request.send();
+
     return source;
   }
 
