@@ -67,12 +67,17 @@ function getAudioFile(audioCtx, audioElement, url) {
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioContext = new AudioContext();
+document.body.addEventListener('touchstart', function(){
+  audioContext.resume();
+});
 
 window.onload = function(){
   const audioElement = document.getElementById('audioEl');
   //const track = audioContext.createMediaElementSource(audioElement);
   analyser = audioContext.createAnalyser();
   analyser.fftSize = 2048;
+
+
 
   //track.connect(analyser);
   //analyser.connect(audioContext.destination);

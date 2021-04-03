@@ -30,7 +30,7 @@
                 source.buffer = audioBuffer;
                 audioElement.controls = true;
 
-                audioCtx.resume();
+                //audioCtx.resume();
 
                 //source.connect(audioCtx.destination);
                 //source.loop = true;
@@ -71,7 +71,7 @@
     analyser.connect(audioContext.destination);
 
     audio.onplay = function(){
-        audioContext.resume();
+        //audioContext.resume();
         console.log("onplay");
         track.disconnect(analyser);
         track = audioContext.createBufferSource();
