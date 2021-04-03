@@ -60,6 +60,7 @@
     const audioContext = new AudioContext();
     audioContext.onstatechange = () => alert(audioContext.state);
     track = getAudioFile(audioContext, audio, url);
+    audioContext.createGain();
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 2048;
 
