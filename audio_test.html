@@ -58,7 +58,7 @@
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioContext = new AudioContext();
-    audioContext.onstatechange = () => alert(audioContext.state);
+    //audioContext.onstatechange = () => alert(audioContext.state);
     track = getAudioFile(audioContext, audio, url);
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 2048;
