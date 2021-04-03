@@ -42,8 +42,8 @@ window.onload = function(){
   analyser = audioContext.createAnalyser();
   analyser.fftSize = 2048;
 
-  track.connect(analyser);
-  analyser.connect(audioContext.destination);
+  //track.connect(analyser);
+  //analyser.connect(audioContext.destination);
 }
 
 /*
