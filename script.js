@@ -24,21 +24,53 @@ SOFTWARE.
 
 'use strict';
 
-// Mobile promo section
-
-const promoPopup = document.getElementsByClassName('promo')[0];
-const promoPopupClose = document.getElementsByClassName('promo-close')[0];
 
 var max = 0.00000001;
 
 
 var analyser;
 
+var buffer;
+
+function getAudioFile(audioCtx, audioElement, url) {
+  var source = audioCtx.createBufferSource();
+  var request = new XMLHttpRequest();
+
+  request.open('GET', url, true);
+
+  request.responseType = 'blob';
+
+  request.onload = function(e) {
+      var blob = this.response;
+      var fileReader = new FileReader();
+      fileReader.onload = function() {
+          var arrayBuffer = this.result;
+
+          audioCtx.decodeAudioData(arrayBuffer, function(audioBuffer) {
+              buffer = audioBuffer;
+              source.buffer = audioBuffer;
+
+              //source.connect(audioCtx.destination);
+              //source.loop = true;
+            },
+            function(e){ console.log("Error with decoding audio data" + e.err); }
+          );
+      };
+      fileReader.readAsArrayBuffer(blob);
+      audioElement.src = window.URL.createObjectURL(blob);
+  }
+
+  request.send();
+
+  return source;
+}
+
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioContext = new AudioContext();
+
 window.onload = function(){
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  const audioContext = new AudioContext();
   const audioElement = document.getElementById('audioEl');
-  const track = audioContext.createMediaElementSource(audioElement);
+  //const track = audioContext.createMediaElementSource(audioElement);
   analyser = audioContext.createAnalyser();
   analyser.fftSize = 2048;
 
@@ -46,29 +78,10 @@ window.onload = function(){
   //analyser.connect(audioContext.destination);
 }
 
-/*
-if (isMobile()) {
-    setTimeout(() => {
-        promoPopup.style.display = 'table';
-    }, 20000);
-}
-*/
 
-promoPopupClose.addEventListener('click', e => {
-    promoPopup.style.display = 'none';
-});
 
-const appleLink = document.getElementById('apple_link');
-appleLink.addEventListener('click', e => {
-    ga('send', 'event', 'link promo', 'app');
-    window.open('https://apps.apple.com/us/app/fluid-simulation/id1443124993');
-});
 
-const googleLink = document.getElementById('google_link');
-googleLink.addEventListener('click', e => {
-    ga('send', 'event', 'link promo', 'app');
-    window.open('https://play.google.com/store/apps/details?id=games.paveldogreat.fluidsimfree');
-});
+
 
 // Simulation section
 
@@ -667,6 +680,9 @@ function touchstartListener(){
   window.removeEventListener('touchstart',touchstartListener);
 }
 
+var track;
+var track_time = 0;
+
 
 function startGUI () {
     var gui = new dat.GUI({ width: 300 });
@@ -682,9 +698,25 @@ function startGUI () {
     audio.controls = true;
     audio.loop = false;
     audio.autoplay = false;
-    audio.muted = false;
+    audio.muted = true;
     window.addEventListener('touchstart',touchstartListener);
     audioController.domElement.appendChild(audio);
+
+    audio.onplay = function(){
+        track.disconnect(analyser);
+        track = audioContext.createBufferSource();
+        track.connect(analyser);
+        track.buffer = buffer;
+        track.start(0,track_time);
+    };
+
+    audio.ontimeupdate = function(){
+        track_time = audio.currentTime;
+    };
+
+    audio.onpause = function(){
+        track.stop();
+    };
 
     let fileUpload = gui.add({track: () => {
 
@@ -715,10 +747,18 @@ function startGUI () {
       "RJD2 - ghostwriter": "music/rjd2_ghostwriter.mp3",
       "Surf Mesa - ily": "music/surf_mesa_ily.mp3"
     }).name("samples").onFinishChange(function(){
+      /*
       audio.setAttribute('src',track_sample.value);
       max = 0.000001;
       max_amplitude = 0.000001;
       max_spectral_flux = 0.000001;
+      */
+      track = getAudioFile(audioContext, audio, track_sample.value);
+      track.connect(analyser);
+      track_time = 0;
+      analyser.connect(audioContext.destination);
+      audio.play();
+      audio.pause();
     });
     /*
     $('input').on('change', function(e) {
@@ -1773,6 +1813,7 @@ function update () {
         max = brightness;
       }
       brightness_norm = brightness/max;
+      //console.log(`value: ${brightness_norm}`);
 
     }else{
       brightness_norm = 0;
