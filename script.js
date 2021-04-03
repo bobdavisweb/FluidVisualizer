@@ -660,6 +660,13 @@ var intensity_functions = {
   "spectral flux": spectralFlux
 }
 
+function touchstartListener(){
+  alert('touchstart');
+  audio.play();
+  audio.pause();
+  window.removeEventListener('touchstart',touchstartListener);
+}
+
 
 function startGUI () {
     var gui = new dat.GUI({ width: 300 });
@@ -676,11 +683,7 @@ function startGUI () {
     audio.loop = false;
     audio.autoplay = false;
     audio.muted = false;
-    window.addEventListener('touchstart', () => {
-      alert("touchstart!");
-      audio.play();
-      audio.pause();
-    });
+    window.addEventListener('touchstart',touchstartListener);
     audioController.domElement.appendChild(audio);
 
     let fileUpload = gui.add({track: () => {
