@@ -49,6 +49,7 @@ function getAudioFile(audioCtx, audioElement, url) {
           audioCtx.decodeAudioData(arrayBuffer, function(audioBuffer) {
               buffer = audioBuffer;
               source.buffer = audioBuffer;
+              audioElement.controls = true;
 
               //source.connect(audioCtx.destination);
               //source.loop = true;
@@ -702,7 +703,7 @@ function startGUI () {
     var audio = new Audio();
     //audio.src = 'music/surf_mesa_ily.mp3';
     audio.id = "audioEl";
-    audio.controls = true;
+    audio.controls = false;
     audio.loop = false;
     audio.autoplay = false;
     audio.muted = true;
@@ -760,6 +761,7 @@ function startGUI () {
       max_amplitude = 0.000001;
       max_spectral_flux = 0.000001;
       */
+      audio.controls = false;
       track = getAudioFile(audioContext, audio, track_sample.value);
       track.connect(analyser);
       track_time = 0;
