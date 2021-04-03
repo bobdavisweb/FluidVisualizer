@@ -15,17 +15,30 @@
     request.open('GET', url, true);
 
     request.responseType = 'blob';
+    var l = document.createElement('div');
+    l.innerHTML = "getAudioFile(...)";
+    document.body.append(l);
+
 
     request.onload = function(e) {
-        console.log("request loaded");
+        var l = document.createElement('div');
+        l.innerHTML = "request loaded";
+        document.body.append(l);
+
         var blob = this.response;
         var fileReader = new FileReader();
         fileReader.onload = function() {
-            console.log("arraybuffer loaded");
+            var l = document.createElement('div');
+            l.innerHTML = "array buffer loaded";
+            document.body.append(l);
+
             var arrayBuffer = this.result;
 
             audioCtx.decodeAudioData(arrayBuffer, function(audioBuffer) {
-                console.log("audiobuffer decoded");
+                var l = document.createElement('div');
+                l.innerHTML = "audio buffer loaded";
+                document.body.append(l);
+
                 buffer = audioBuffer;
                 source.buffer = audioBuffer;
                 audioElement.controls = true;
@@ -72,7 +85,10 @@
 
     audio.onplay = function(){
         //audioContext.resume();
-        console.log("onplay");
+        var l = document.createElement('div');
+        l.innerHTML = "play";
+        document.body.append(l);
+
         track.disconnect(analyser);
         track = audioContext.createBufferSource();
         track.connect(analyser);
@@ -85,8 +101,10 @@
     };
 
     audio.onpause = function(){
-        console.log("onpause");
-        track.stop();
+        var l = document.createElement('div');
+        l.innerHTML = "pause";
+        document.body.append(l);
+        //track.stop();
     };
 
     //audio.play();
