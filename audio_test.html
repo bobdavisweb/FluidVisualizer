@@ -29,9 +29,8 @@
                 buffer = audioBuffer;
                 source.buffer = audioBuffer;
                 audioElement.controls = true;
-                alert(audioCtx.state);
+
                 audioCtx.resume();
-                alert(audioCtx.state);
 
                 //source.connect(audioCtx.destination);
                 //source.loop = true;
@@ -59,6 +58,7 @@
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioContext = new AudioContext();
+    audioContext.onstatechange = () => alert(audioContext.state);
     track = getAudioFile(audioContext, audio, url);
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 2048;
