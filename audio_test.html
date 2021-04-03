@@ -60,7 +60,6 @@
     const audioContext = new AudioContext();
     audioContext.onstatechange = () => alert(audioContext.state);
     track = getAudioFile(audioContext, audio, url);
-    audioContext.createGain();
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 2048;
 
@@ -69,6 +68,7 @@
     analyser.connect(audioContext.destination);
 
     audio.onplay = function(){
+        audioContext.resume();
         console.log("onplay");
         track.disconnect(analyser);
         track = audioContext.createBufferSource();
