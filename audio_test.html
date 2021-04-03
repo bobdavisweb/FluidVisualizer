@@ -1,8 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <script type="text/javascript">
+  var audio = new Audio();
+  audio.src = "music/surf_mesa_ily.mp3";
+  audio.controls = true;
+  audio.loop = false;
+  audio.autoplay = false;
+  audio.muted = false;
+  document.getElementById("audio").appendChild(audio);
+  </script>
 </head>
 <body>
-<audio src="music/surf_mesa_ily.mp3" controls></audio>
+<div id="audio"></div>
 </body>
 </html>
