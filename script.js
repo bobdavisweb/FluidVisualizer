@@ -661,7 +661,6 @@ var intensity_functions = {
 }
 
 function touchstartListener(){
-  alert('touchstart');
   audio.play();
   audio.pause();
   window.removeEventListener('touchstart',touchstartListener);
