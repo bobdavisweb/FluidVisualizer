@@ -1,6 +1,9 @@
 <!DOCTYPE html>
+<meta charset="utf-8">
 <html>
 <head>
+  <!-- no favicon -->
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <script type="text/javascript">
   function getAudioFile(audioCtx, audioElement, url) {
     source = audioCtx.createBufferSource();
@@ -10,7 +13,8 @@
 
     request.responseType = 'blob';
 
-    request.onload = function(blob) {
+    request.onload = function(e) {
+        var blob = this.response;
         var fileReader = new FileReader();
         fileReader.onload = function() {
             var arrayBuffer = this.result;
@@ -36,7 +40,6 @@
   window.onload = function(){
     const url = "music/surf_mesa_ily.mp3";
     var audio = new Audio();
-    audio.src = url;
     audio.controls = true;
     audio.loop = false;
     audio.autoplay = false;
@@ -45,13 +48,13 @@
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioContext = new AudioContext();
-    const track = getAudioFile(audioContext, url);
-    /*const analyser = audioContext.createAnalyser();
+    const track = getAudioFile(audioContext, audio, url);
+    const analyser = audioContext.createAnalyser();
     analyser.fftSize = 2048;
 
     track.connect(analyser);
     analyser.connect(audioContext.destination);
-    */
+
   }
   </script>
 </head>
