@@ -5,6 +5,9 @@
   <!-- no favicon -->
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <script type="text/javascript">
+  var buffer;
+  var track;
+  var track_time = 0;
   function getAudioFile(audioCtx, audioElement, url) {
     source = audioCtx.createBufferSource();
     var request = new XMLHttpRequest();
@@ -14,13 +17,18 @@
     request.responseType = 'blob';
 
     request.onload = function(e) {
+        console.log("request loaded");
         var blob = this.response;
         var fileReader = new FileReader();
         fileReader.onload = function() {
+            console.log("arraybuffer loaded");
             var arrayBuffer = this.result;
 
             audioCtx.decodeAudioData(arrayBuffer, function(audioBuffer) {
+                console.log("audiobuffer decoded");
+                buffer = audioBuffer;
                 source.buffer = audioBuffer;
+                audioElement.controls = true;
 
                 //source.connect(audioCtx.destination);
                 //source.loop = true;
@@ -40,21 +48,41 @@
   window.onload = function(){
     const url = "music/surf_mesa_ily.mp3";
     var audio = new Audio();
-    audio.controls = true;
+    audio.controls = false;
     audio.loop = false;
     audio.autoplay = false;
-    audio.muted = false;
+    audio.muted = true;
     document.getElementById("audio").appendChild(audio);
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioContext = new AudioContext();
-    const track = getAudioFile(audioContext, audio, url);
+    track = getAudioFile(audioContext, audio, url);
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 2048;
+
 
     track.connect(analyser);
     analyser.connect(audioContext.destination);
 
+    audio.onplay = function(){
+        console.log("onplay");
+        track.disconnect(analyser);
+        track = audioContext.createBufferSource();
+        track.connect(analyser);
+        track.buffer = buffer;
+        track.start(0,track_time);
+    };
+
+    audio.ontimeupdate = function(){
+        track_time = audio.currentTime;
+    };
+
+    audio.onpause = function(){
+        console.log("onpause");
+        track.stop();
+    };
+    //audio.play();
+    //audio.pause();
   }
   </script>
 </head>
