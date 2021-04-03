@@ -62,6 +62,9 @@
     track = getAudioFile(audioContext, audio, url);
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 2048;
+    document.body.addEventListener('touchstart', function(){
+      audioContext.resume();
+    });
 
 
     track.connect(analyser);
