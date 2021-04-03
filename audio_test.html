@@ -30,6 +30,8 @@
                 source.buffer = audioBuffer;
                 audioElement.controls = true;
                 alert(audioCtx.state);
+                audioCtx.resume();
+                alert(audioCtx.state);
 
                 //source.connect(audioCtx.destination);
                 //source.loop = true;
