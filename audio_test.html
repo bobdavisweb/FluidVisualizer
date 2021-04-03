@@ -2,9 +2,36 @@
 <html>
 <head>
   <script type="text/javascript">
+  function getAudioFile(audioCtx, url) {
+    source = audioCtx.createBufferSource();
+    var request = new XMLHttpRequest();
+
+    request.open('GET', url, true);
+
+    request.responseType = 'arraybuffer';
+
+    request.onload = function() {
+      var audioData = request.response;
+
+      audioCtx.decodeAudioData(audioData, function(buffer) {
+          source.buffer = buffer;
+
+          //source.connect(audioCtx.destination);
+          //source.loop = true;
+        },
+
+        function(e){ console.log("Error with decoding audio data" + e.err); });
+
+    }
+
+    request.send();
+    return source;
+  }
+
   window.onload = function(){
+    const url = "music/surf_mesa_ily.mp3";
     var audio = new Audio();
-    audio.src = "music/surf_mesa_ily.mp3";
+    audio.src = url;
     audio.controls = true;
     audio.loop = false;
     audio.autoplay = false;
@@ -13,7 +40,7 @@
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioContext = new AudioContext();
-    const track = audioContext.createMediaElementSource(audio);
+    const track = getAudioFile(audioContext, url);
     /*const analyser = audioContext.createAnalyser();
     analyser.fftSize = 2048;
 
