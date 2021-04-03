@@ -676,6 +676,11 @@ function startGUI () {
     audio.loop = false;
     audio.autoplay = false;
     audio.muted = false;
+    window.addEventListener('touchstart', () => {
+      alert("touchstart!");
+      audio.play();
+      audio.pause();
+    });
     audioController.domElement.appendChild(audio);
 
     let fileUpload = gui.add({track: () => {
