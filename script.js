@@ -70,7 +70,7 @@ const audioContext = new AudioContext();
 document.body.addEventListener('touchstart', function(){
   audioContext.resume();
 });
-audioContext.onstatechange = () => alert(audioContext.state);
+//audioContext.onstatechange = () => alert(audioContext.state);
 
 
 window.onload = function(){
