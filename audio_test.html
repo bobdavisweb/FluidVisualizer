@@ -29,6 +29,7 @@
                 buffer = audioBuffer;
                 source.buffer = audioBuffer;
                 audioElement.controls = true;
+                alert(audioCtx.state);
 
                 //source.connect(audioCtx.destination);
                 //source.loop = true;
@@ -81,6 +82,7 @@
         console.log("onpause");
         track.stop();
     };
+
     //audio.play();
     //audio.pause();
   }
