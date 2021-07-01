@@ -688,7 +688,7 @@ function touchstartListener(){
   window.removeEventListener('touchstart',touchstartListener);
 }
 
-var track;
+var track = audioContext.createBufferSource();
 var track_time = 0;
 
 
