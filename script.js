@@ -28,10 +28,14 @@ SOFTWARE.
 var max = 0.00000001;
 
 
+var audio = new Audio();
 var analyser;
-
 var buffer;
 
+
+/*
+Load audio file from URL into audio element.
+*/
 function getAudioFile(audioCtx, audioElement, url) {
   var source = audioCtx.createBufferSource();
   var request = new XMLHttpRequest();
@@ -66,6 +70,36 @@ function getAudioFile(audioCtx, audioElement, url) {
   return source;
 }
 
+
+function uploadAudioFile(e){
+  console.log("file input")
+  var target = e.currentTarget;
+  var file = target.files[0];
+  var reader = new FileReader();
+  reader.onload = function(e){
+    console.log("reader.onload")
+    console.log(e)
+    audio.setAttribute('src',e.target.result);
+    audio.controls = true;
+    console.log(audio)
+    //audio.play();
+    //audio.pause();
+    track = audioContext.createMediaElementSource(audio);
+    track.connect(analyser);
+    analyser.connect(audioContext.destination);
+
+    max = 0.000001;
+    max_amplitude = 0.000001;
+    max_spectral_flux = 0.000001;
+  }
+  reader.readAsDataURL(file);
+}
+
+
+
+
+
+
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioContext = new AudioContext();
 document.body.addEventListener('touchstart', function(){
@@ -76,14 +110,9 @@ document.body.addEventListener('touchstart', function(){
 
 window.onload = function(){
   const audioElement = document.getElementById('audioEl');
-  //const track = audioContext.createMediaElementSource(audioElement);
+  const track = audioContext.createMediaElementSource(audioElement);
   analyser = audioContext.createAnalyser();
   analyser.fftSize = 2048;
-
-
-
-  //track.connect(analyser);
-  //analyser.connect(audioContext.destination);
 }
 
 
@@ -688,7 +717,7 @@ function touchstartListener(){
   window.removeEventListener('touchstart',touchstartListener);
 }
 
-var track = audioContext.createBufferSource();
+var track;
 var track_time = 0;
 
 
@@ -700,17 +729,20 @@ function startGUI () {
     }},'audio');
 
 
-    var audio = new Audio();
-    //audio.src = 'music/surf_mesa_ily.mp3';
     audio.id = "audioEl";
     audio.controls = false;
     audio.loop = false;
     audio.autoplay = false;
-    audio.muted = true;
+    //audio.muted = true;
     window.addEventListener('touchstart',touchstartListener);
     audioController.domElement.appendChild(audio);
 
+
+    /*
+
     audio.onplay = function(){
+        console.log("audio.onplay")
+        console.log(track)
         track.disconnect(analyser);
         track = audioContext.createBufferSource();
         track.connect(analyser);
@@ -725,6 +757,8 @@ function startGUI () {
     audio.onpause = function(){
         track.stop();
     };
+    */
+
 
     let fileUpload = gui.add({track: () => {
 
@@ -733,41 +767,18 @@ function startGUI () {
     fileInput.setAttribute('type','file');
     fileUpload.domElement.appendChild(fileInput);
 
-    fileInput.onchange = function(e){
-      var target = e.currentTarget;
-      var file = target.files[0];
-      var reader = new FileReader();
-      reader.onload = function(e){
-        audio.setAttribute('src',e.target.result);
-        audio.play();
-        audio.pause();
-        //const track = audioContext.createMediaElementSource(audio);
-        //track.connect(analyser);
-        max = 0.000001;
-        max_amplitude = 0.000001;
-        max_spectral_flux = 0.000001;
-      }
-      reader.readAsDataURL(file);
-    }
+    fileInput.onchange = uploadAudioFile;
 
     gui.add(track_sample, "value", {
       "Spoon - don't you evah": "music/spoon_dont_you_evah.mp3",
       "RJD2 - ghostwriter": "music/rjd2_ghostwriter.mp3",
       "Surf Mesa - ily": "music/surf_mesa_ily.mp3"
     }).name("samples").onFinishChange(function(){
-      /*
-      audio.setAttribute('src',track_sample.value);
-      max = 0.000001;
-      max_amplitude = 0.000001;
-      max_spectral_flux = 0.000001;
-      */
       audio.controls = false;
       track = getAudioFile(audioContext, audio, track_sample.value);
       track.connect(analyser);
       track_time = 0;
       analyser.connect(audioContext.destination);
-      audio.play();
-      audio.pause();
     });
     /*
     $('input').on('change', function(e) {
